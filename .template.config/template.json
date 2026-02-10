@@ -1,9 +1,9 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Ridu",
+  "author": "Hasibul Hasan",
   "classifications": ["Web", "API", "Clean Architecture"],
   "identity": "Ridu.DotRidu.Template",
-  "name": "DotRidu .NET Template",
+  "name": "DotRidu Clean .NET Template",
   "shortName": "dotridu",
   "tags": {
     "language": "C#",
