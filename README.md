@@ -1,7 +1,9 @@
-# DotRidu - Clean Architecture Template
+﻿# DotRidu - Clean Architecture Template
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![NuGet](https://img.shields.io/nuget/v/dotridu)](https://www.nuget.org/packages/dotridu)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/dotridu)](https://www.nuget.org/packages/dotridu)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
+[![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 
 A production-ready ASP.NET Core Clean Architecture template with JWT authentication, Repository Pattern, and Entity Framework Core.
 
@@ -9,8 +11,7 @@ A production-ready ASP.NET Core Clean Architecture template with JWT authenticat
 
 ### Install Template
 ```bash
-# Install from GitHub
-dotnet new install https://github.com/iamhasibulhasan/DotRidu
+dotnet new install dotridu
 ```
 
 ### Create New Project
@@ -28,19 +29,28 @@ dotnet restore
 dotnet run
 ```
 
+### Uninstall Template
+```bash
+dotnet new uninstall dotridu
+```
+
 ## 📁 Project Structure
 ```
-YourProject/
-├── API/                    # Presentation Layer
-├── Application/       # Business Logic Layer
-├── Domain/             # Domain Layer (Entities, Interfaces)
-└── Infrastructure/    # Infrastructure Layer (Data Access)
+YourProjectName/
+├── src/
+│   ├── Core/
+│   │   ├── YourProjectName.Application/     # Business Logic Layer
+│   │   ├── YourProjectName.Domain/          # Domain Layer (Entities, Interfaces)
+│   │   └── YourProjectName.Infrastructure/  # Infrastructure Layer (Data Access)
+│   └── Web.Api/
+│       └── YourProjectName.WebApi/          # Presentation Layer
+└── YourProjectName.slnx
 ```
 
 ## ✨ Features
 - ✅ Clean Architecture
 - ✅ JWT Authentication
-- ✅ Repository Pattern + Unit of Work
+- ✅ Repository Pattern
 - ✅ Entity Framework Core
 - ✅ Swagger/OpenAPI
 - ✅ Global Exception Handling
@@ -48,26 +58,23 @@ YourProject/
 - ✅ Health Checks
 - ✅ CORS Configuration
 
-## 🔧 Advanced Usage
-
-### Install Specific Version
+## 🔧 Upgrade Template
 ```bash
-# Install from specific branch/tag
-dotnet new install https://github.com/iamhasibulhasan/DotRidu#main
-```
+# Uninstall old version
+dotnet new uninstall dotridu
 
-### Uninstall Template
-```bash
-dotnet new uninstall https://github.com/iamhasibulhasan/DotRidu
+# Install latest version
+dotnet new install dotridu
 ```
-
-## 📚 Documentation
-- [Getting Started Guide](docs/getting-started.md)
-- [Architecture Overview](docs/architecture.md)
-- [API Documentation](docs/api.md)
 
 ## 🤝 Contributing
-Pull requests are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Pull requests are welcome!
+
+## 👤 Author
+**Hasibul Hasan**
+- Portfolio: [abouthasibul.com](https://abouthasibul.com/)
+- NuGet: [nuget.org/profiles/iamhasibulhasan](https://www.nuget.org/profiles/iamhasibulhasan)
+- GitHub: [github.com/iamhasibulhasan](https://github.com/iamhasibulhasan)
 
 ## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.

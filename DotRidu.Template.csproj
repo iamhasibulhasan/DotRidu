@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>dotridu</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>DotRidu Clean .NET Template</Title>
+    <Authors>Hasibul Hasan</Authors>
+    <Owners>iamhasibulhasan</Owners>
+    <Description>A production-ready ASP.NET Core Clean Architecture template with JWT authentication, Repository Pattern, and Entity Framework Core.</Description>
+    <PackageTags>dotnet;template;clean-architecture;csharp;webapi;jwt;ef-core;repository-pattern</PackageTags>
+    <PackageType>Template</PackageType>
+    <PackageProjectUrl>https://github.com/iamhasibulhasan/DotRidu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/iamhasibulhasan/DotRidu</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright © 2026 Hasibul Hasan</Copyright>
+
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <NoBuild>true</NoBuild>
+    <NoRestore>true</NoRestore>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include=".template.config\**" />
+    <Content Include="src\**" />
+    <Content Include="DotRidu.slnx" />
+    <Content Include="LICENSE.txt" />
+
+    <Content Remove=".git\**" />
+    <Content Remove=".gitignore" />
+    <Content Remove="DotRidu.Template.csproj" />
+    <Content Remove="src\**\bin\**" />
+    <Content Remove="src\**\obj\**" />
+
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
