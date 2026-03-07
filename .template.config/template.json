@@ -2,13 +2,10 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "Hasibul Hasan",
   "classifications": ["Web", "API", "Clean Architecture"],
-  "identity": "Ridu.DotRidu.Template",
-  "name": "DotRidu Clean .NET Template",
+  "identity": "DotRidu.CleanArchitecture",
+  "name": "DotRidu Clean Architecture Template",
   "shortName": "dotridu",
-  "tags": {
-    "language": "C#",
-    "type": "project"
-  },
+  "tags": { "language": "C#", "type": "project" },
   "sourceName": "DotRidu",
   "preferNameDirectory": true
 }
