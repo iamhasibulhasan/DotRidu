@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DEMO Solution — Folder Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  [data-theme="dark"] {
+    --bg:#0d1117; --bg2:#161b22; --bg3:#1f2937;
+    --border:#30363d; --border2:#3d4a5a;
+    --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+    --shadow:rgba(0,0,0,0.4);
+    --purple:#a78bfa; --purple-bg:#1e1a2e;
+    --teal:#34d399;   --teal-bg:#0d2a20;
+    --coral:#f87171;  --coral-bg:#2d1515;
+    --amber:#fbbf24;  --amber-bg:#2a1f07;
+    --blue:#60a5fa;   --blue-bg:#0c1f3a;
+    --gray:#94a3b8;   --green:#4ade80;
+    --code-bg:rgba(255,255,255,0.06);
+    --row-hover:rgba(255,255,255,0.04);
+    --row-active:rgba(167,139,250,0.1);
+    --table-th:rgba(255,255,255,0.02);
+    --pre-bg:rgba(255,255,255,0.03);
+  }
+  [data-theme="light"] {
+    --bg:#f6f8fa; --bg2:#ffffff; --bg3:#eef1f5;
+    --border:#d0d7de; --border2:#b0bac5;
+    --text:#1f2328; --text2:#57606a; --text3:#8c959f;
+    --shadow:rgba(0,0,0,0.08);
+    --purple:#7c3aed; --purple-bg:#f3f0ff;
+    --teal:#059669;   --teal-bg:#ecfdf5;
+    --coral:#dc2626;  --coral-bg:#fef2f2;
+    --amber:#d97706;  --amber-bg:#fffbeb;
+    --blue:#2563eb;   --blue-bg:#eff6ff;
+    --gray:#475569;   --green:#16a34a;
+    --code-bg:rgba(0,0,0,0.06);
+    --row-hover:rgba(0,0,0,0.03);
+    --row-active:rgba(124,58,237,0.08);
+    --table-th:rgba(0,0,0,0.02);
+    --pre-bg:rgba(0,0,0,0.02);
+  }
+
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; line-height:1.6; min-height:100vh; transition:background 0.2s,color 0.2s; }
+
+  header { background:var(--bg2); border-bottom:1px solid var(--border); padding:22px 4vw 18px; position:sticky; top:0; z-index:100; box-shadow:0 1px 8px var(--shadow); }
+  .header-inner { width:100%; display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+  .header-left h1 { font-family:'JetBrains Mono',monospace; font-size:clamp(16px,2vw,22px); font-weight:600; color:var(--text); letter-spacing:-0.5px; }
+  .header-left h1 span { color:var(--purple); }
+  .header-left p { color:var(--text2); font-size:13px; margin-top:4px; }
+  .badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .badge { font-family:'JetBrains Mono',monospace; font-size:11px; padding:3px 10px; border-radius:20px; border:1px solid; font-weight:500; }
+  .badge-purple { color:var(--purple); border-color:var(--purple); background:var(--purple-bg); }
+  .badge-teal   { color:var(--teal);   border-color:var(--teal);   background:var(--teal-bg); }
+  .badge-coral  { color:var(--coral);  border-color:var(--coral);  background:var(--coral-bg); }
+
+  .theme-toggle { display:flex; align-items:center; gap:8px; flex-shrink:0; margin-top:4px; }
+  .toggle-btn { position:relative; width:48px; height:26px; background:var(--border2); border:none; border-radius:13px; cursor:pointer; transition:background 0.25s; outline:none; }
+  .toggle-btn::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; background:var(--bg2); border-radius:50%; transition:transform 0.25s,background 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+  [data-theme="light"] .toggle-btn { background:var(--purple); }
+  [data-theme="light"] .toggle-btn::after { transform:translateX(22px); }
+  .toggle-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); user-select:none; }
+
+  .layout { width:100%; padding:32px 4vw; display:grid; grid-template-columns:360px 1fr; gap:32px; align-items:start; }
+
+  .tree-panel { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; position:sticky; top:90px; box-shadow:0 2px 12px var(--shadow); }
+  .tree-header { background:var(--bg3); border-bottom:1px solid var(--border); padding:11px 16px; display:flex; align-items:center; gap:8px; }
+  .tree-header .dot { width:12px; height:12px; border-radius:50%; }
+  .dot-red{background:#ff5f57} .dot-yellow{background:#ffbd2e} .dot-green{background:#28c840}
+  .tree-header-label { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text2); flex:1; }
+  .tree-ctrl-btns { display:flex; gap:4px; }
+  .tree-ctrl-btn { font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid var(--border2); background:transparent; color:var(--text3); cursor:pointer; transition:all 0.15s; }
+  .tree-ctrl-btn:hover { color:var(--text); border-color:var(--text3); background:var(--row-hover); }
+
+  .tree-body { padding:12px 6px 16px; max-height:calc(100vh - 180px); overflow-y:auto; }
+  .tree-body::-webkit-scrollbar{width:4px} .tree-body::-webkit-scrollbar-track{background:transparent} .tree-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+  /* Collapsible folders — pure CSS checkbox trick */
+  .folder-toggle { display:none; }
+  .folder-children { display:flex; flex-direction:column; }
+  .folder-toggle:not(:checked) ~ .folder-children { display:none; }
+
+  .folder-row { display:flex; align-items:center; gap:0; padding:3px 4px; cursor:pointer; border-radius:6px; transition:background 0.15s; user-select:none; }
+  .folder-row:hover { background:var(--row-hover); }
+
+  .chevron { font-size:9px; color:var(--text3); width:14px; text-align:center; flex-shrink:0; transition:transform 0.18s; display:inline-block; }
+  .folder-toggle:not(:checked) ~ .folder-row .chevron { transform:rotate(-90deg); }
+
+  .file-row { display:flex; align-items:center; gap:0; padding:3px 4px; border-radius:6px; transition:background 0.15s; }
+  .file-row:hover { background:var(--row-hover); }
+  .file-row.active { background:var(--row-active); }
+
+  .tree-indent { display:flex; align-items:stretch; flex-shrink:0; }
+  .tree-line { width:20px; position:relative; flex-shrink:0; }
+  .tree-line::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:1px; background:var(--border2); }
+  .tree-line.last::after,.tree-line.branch::after { content:''; position:absolute; left:10px; top:50%; width:10px; height:1px; background:var(--border2); }
+  .tree-line.branch::before { bottom:0; }
+  .tree-line.last::before { bottom:50%; }
+  .tree-line.empty::before { display:none; }
+
+  .tree-icon { font-size:14px; width:20px; text-align:center; flex-shrink:0; }
+  .tree-label { font-family:'JetBrains Mono',monospace; font-size:12px; padding:2px 6px 2px 3px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tree-tag { font-size:10px; padding:1px 6px; border-radius:10px; margin-left:5px; font-weight:500; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+
+  .c-solution{color:var(--text)} .c-purple{color:var(--purple)} .c-teal{color:var(--teal)}
+  .c-coral{color:var(--coral)} .c-amber{color:var(--amber)} .c-blue{color:var(--blue)}
+  .c-gray{color:var(--gray)} .c-green{color:var(--green)}
+
+  .tag-entity  { background:var(--amber-bg);  color:var(--amber);  border:1px solid color-mix(in srgb,var(--amber) 40%,transparent); }
+  .tag-feature { background:var(--teal-bg);   color:var(--teal);   border:1px solid color-mix(in srgb,var(--teal) 40%,transparent); }
+  .tag-shared  { background:var(--purple-bg); color:var(--purple); border:1px solid color-mix(in srgb,var(--purple) 40%,transparent); }
+  .tag-infra   { background:var(--bg3);       color:var(--gray);   border:1px solid var(--border2); }
+  .tag-api     { background:var(--coral-bg);  color:var(--coral);  border:1px solid color-mix(in srgb,var(--coral) 40%,transparent); }
+
+  .docs-panel { display:flex; flex-direction:column; gap:32px; }
+  .section-label { font-size:11px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:12px; font-family:'JetBrains Mono',monospace; }
+
+  .doc-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:border-color 0.2s,box-shadow 0.2s; }
+  .doc-card:hover { border-color:var(--border2); box-shadow:0 2px 10px var(--shadow); }
+  .doc-card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+  .doc-card-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .icon-purple{background:var(--purple-bg);border:1px solid color-mix(in srgb,var(--purple) 35%,transparent)}
+  .icon-teal  {background:var(--teal-bg);  border:1px solid color-mix(in srgb,var(--teal) 35%,transparent)}
+  .icon-coral {background:var(--coral-bg); border:1px solid color-mix(in srgb,var(--coral) 35%,transparent)}
+  .icon-amber {background:var(--amber-bg); border:1px solid color-mix(in srgb,var(--amber) 35%,transparent)}
+  .icon-gray  {background:var(--bg3);      border:1px solid var(--border2)}
+  .doc-card-title h3 { font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:var(--text); }
+  .doc-card-title p  { font-size:12px; color:var(--text2); margin-top:2px; }
+  .doc-card-body { padding:20px; }
+
+  .sub-items { display:flex; flex-direction:column; gap:16px; }
+  .sub-item { display:flex; gap:14px; }
+  .sub-item-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+  .sub-item-text h4 { font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:500; color:var(--text); margin-bottom:3px; }
+  .sub-item-text p { font-size:12px; color:var(--text2); line-height:1.6; }
+  .divider { height:1px; background:var(--border); margin:14px 0; }
+
+  code { font-family:'JetBrains Mono',monospace; font-size:11.5px; background:var(--code-bg); padding:1px 5px; border-radius:4px; color:var(--amber); }
+
+  .flow-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .flow-box { font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 10px; border-radius:6px; border:1px solid; font-weight:500; }
+  .flow-arrow { color:var(--text3); font-size:14px; }
+  .fb-purple{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 50%,transparent);background:var(--purple-bg)}
+  .fb-teal  {color:var(--teal);  border-color:color-mix(in srgb,var(--teal) 50%,transparent);  background:var(--teal-bg)}
+  .fb-coral {color:var(--coral); border-color:color-mix(in srgb,var(--coral) 50%,transparent);  background:var(--coral-bg)}
+  .fb-amber {color:var(--amber); border-color:color-mix(in srgb,var(--amber) 50%,transparent);  background:var(--amber-bg)}
+
+  .pattern-table { width:100%; border-collapse:collapse; margin-top:4px; }
+  .pattern-table th,.pattern-table td { text-align:left; padding:8px 12px; font-size:12px; border-bottom:1px solid var(--border); }
+  .pattern-table th { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); font-weight:500; letter-spacing:0.5px; background:var(--table-th); }
+  .pattern-table td { color:var(--text2); }
+  .pattern-table td:first-child { font-family:'JetBrains Mono',monospace; color:var(--text); font-size:11.5px; }
+  .pattern-table tr:last-child td { border-bottom:none; }
+
+  .legend { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px 20px; }
+  .legend-items { display:flex; flex-wrap:wrap; gap:12px 20px; margin-top:10px; }
+  .legend-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text2); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  footer { border-top:1px solid var(--border); margin-top:60px; padding:20px 0; display:flex; justify-content:space-between; align-items:center; color:var(--text3); font-size:12px; font-family:'JetBrains Mono',monospace; flex-wrap:wrap; gap:8px; }
+
+  pre { overflow-x:auto; }
+
+  @media(max-width:900px){ .layout{grid-template-columns:1fr;padding:20px 4vw} header{padding:16px 4vw} .tree-panel{position:static} footer{flex-direction:column;gap:6px;text-align:center} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>&#x1F4C1; <span>DEMO</span> Solution &#x2014; Folder Architecture</h1>
+      <p>Vertical Slice Architecture &middot; .NET 10 &middot; Clean Structure</p>
+      <div class="badges">
+        <span class="badge badge-purple">DEMO.Core</span>
+        <span class="badge badge-coral">DEMO.WebApi</span>
+        <span class="badge badge-teal">Vertical Slice</span>
+      </div>
+    </div>
+    <div class="theme-toggle">
+      <span>&#x1F319;</span>
+      <button class="toggle-btn" id="themeBtn" title="Toggle light/dark mode" aria-label="Toggle theme"></button>
+      <span>&#x2600;&#xFE0F;</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- TREE PANEL -->
+  <div class="tree-panel">
+    <div class="tree-header">
+      <div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div>
+      <span class="tree-header-label">Solution Explorer</span>
+      <div class="tree-ctrl-btns">
+        <button class="tree-ctrl-btn" onclick="setAllFolders(true)">Expand All</button>
+        <button class="tree-ctrl-btn" onclick="setAllFolders(false)">Collapse All</button>
+      </div>
+    </div>
+    <div class="tree-body">
+      <div style="display:flex;flex-direction:column">
+
+        <!-- Solution root -->
+        <div class="file-row">
+          <div class="tree-icon">&#x1F5C2;&#xFE0F;</div>
+          <span class="tree-label c-solution" style="font-weight:600">Solution &#x27;DEMO&#x27;</span>
+        </div>
+
+        <!-- src -->
+        <div style="display:flex;flex-direction:column">
+          <input type="checkbox" id="f-src" class="folder-toggle" checked>
+          <label for="f-src" class="folder-row">
+            <div class="tree-indent"><div class="tree-line branch"></div></div>
+            <span class="chevron">&#9660;</span>
+            <div class="tree-icon">&#x1F4C2;</div>
+            <span class="tree-label c-gray">src</span>
+          </label>
+          <div class="folder-children">
+
+            <!-- DEMO.Core -->
+            <div style="display:flex;flex-direction:column">
+              <input type="checkbox" id="f-core" class="folder-toggle" checked>
+              <label for="f-core" class="folder-row">
+                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                <span class="chevron">&#9660;</span>
+                <div class="tree-icon">&#x1F7E3;</div>
+                <span class="tree-label c-purple" style="font-weight:600">DEMO.Core</span>
+                <span class="tree-tag tag-shared">Class Library</span>
+              </label>
+              <div class="folder-children">
+
+                <!-- Features -->
+                <div style="display:flex;flex-direction:column">
+                  <input type="checkbox" id="f-features" class="folder-toggle" checked>
+                  <label for="f-features" class="folder-row">
+                    <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                    <span class="chevron">&#9660;</span>
+                    <div class="tree-icon">&#x1F4C2;</div>
+                    <span class="tree-label c-purple">Features</span>
+                  </label>
+                  <div class="folder-children">
+
+                    <!-- Supplier -->
+                    <div style="display:flex;flex-direction:column">
+                      <input type="checkbox" id="f-supplier" class="folder-toggle" checked>
+                      <label for="f-supplier" class="folder-row">
+                        <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                        <span class="chevron">&#9660;</span>
+                        <div class="tree-icon">&#x1F4C2;</div>
+                        <span class="tree-label c-teal">Supplier</span>
+                      </label>
+                      <div class="folder-children">
+
+                        <!-- v1 -->
+                        <div style="display:flex;flex-direction:column">
+                          <input type="checkbox" id="f-v1" class="folder-toggle" checked>
+                          <label for="f-v1" class="folder-row">
+                            <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                            <span class="chevron">&#9660;</span>
+                            <div class="tree-icon">&#x1F4C2;</div>
+                            <span class="tree-label c-teal">v1</span>
+                            <span class="tree-tag tag-feature">versioned</span>
+                          </label>
+                          <div class="folder-children">
+
+                            <!-- CreateSupplier -->
+                            <div style="display:flex;flex-direction:column">
+                              <input type="checkbox" id="f-create" class="folder-toggle" checked>
+                              <label for="f-create" class="folder-row">
+                                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                                <span class="chevron">&#9660;</span>
+                                <div class="tree-icon">&#x1F4C2;</div>
+                                <span class="tree-label c-teal">CreateSupplier</span>
+                              </label>
+                              <div class="folder-children">
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F310;</div><span class="tree-label c-green">CreateSupplierEndpoint.cs</span><span class="tree-tag tag-feature">POST</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">CreateSupplierCommand.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">CreateSupplierHandler.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">CreateSupplierValidator.cs</span></div>
+                              </div>
+                            </div>
+
+                            <!-- GetAllSupplier -->
+                            <div style="display:flex;flex-direction:column">
+                              <input type="checkbox" id="f-getall" class="folder-toggle" checked>
+                              <label for="f-getall" class="folder-row">
+                                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                                <span class="chevron">&#9660;</span>
+                                <div class="tree-icon">&#x1F4C2;</div>
+                                <span class="tree-label c-teal">GetAllSupplier</span>
+                              </label>
+                              <div class="folder-children">
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F310;</div><span class="tree-label c-green">GetAllSupplierEndpoint.cs</span><span class="tree-tag tag-feature">GET</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">GetAllSupplierQuery.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">GetAllSupplierHandler.cs</span></div>
+                              </div>
+                            </div>
+
+                            <!-- UpdateSupplier -->
+                            <div style="display:flex;flex-direction:column">
+                              <input type="checkbox" id="f-update" class="folder-toggle" checked>
+                              <label for="f-update" class="folder-row">
+                                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                                <span class="chevron">&#9660;</span>
+                                <div class="tree-icon">&#x1F4C2;</div>
+                                <span class="tree-label c-teal">UpdateSupplier</span>
+                              </label>
+                              <div class="folder-children">
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F310;</div><span class="tree-label c-green">UpdateSupplierEndpoint.cs</span><span class="tree-tag tag-feature">PUT</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">UpdateSupplierCommand.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">UpdateSupplierHandler.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">UpdateSupplierValidator.cs</span></div>
+                              </div>
+                            </div>
+
+                            <!-- Shared v1 -->
+                            <div style="display:flex;flex-direction:column">
+                              <input type="checkbox" id="f-shared-v1" class="folder-toggle" checked>
+                              <label for="f-shared-v1" class="folder-row">
+                                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div>
+                                <span class="chevron">&#9660;</span>
+                                <div class="tree-icon">&#x1F4C2;</div>
+                                <span class="tree-label c-purple" style="font-weight:600">Shared</span>
+                                <span class="tree-tag tag-entity">entity</span>
+                              </label>
+                              <div class="folder-children">
+                                <div class="file-row active"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-amber">Supplier.cs</span></div>
+                                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-gray">SupplierConfiguration.cs</span><span class="tree-tag tag-infra">EF Core</span></div>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div><!-- /v1 -->
+
+                      </div>
+                    </div><!-- /Supplier -->
+
+                  </div>
+                </div><!-- /Features -->
+
+                <!-- Shared (core level) -->
+                <div style="display:flex;flex-direction:column">
+                  <input type="checkbox" id="f-shared-core" class="folder-toggle" checked>
+                  <label for="f-shared-core" class="folder-row">
+                    <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                    <span class="chevron">&#9660;</span>
+                    <div class="tree-icon">&#x1F4C2;</div>
+                    <span class="tree-label c-gray">Shared</span>
+                    <span class="tree-tag tag-infra">global</span>
+                  </label>
+                  <div class="folder-children">
+                    <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C2;</div><span class="tree-label c-gray">Common</span></div>
+                    <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C2;</div><span class="tree-label c-gray">Constants</span></div>
+                  </div>
+                </div>
+
+                <!-- Persistence -->
+                <div style="display:flex;flex-direction:column">
+                  <input type="checkbox" id="f-persistence" class="folder-toggle" checked>
+                  <label for="f-persistence" class="folder-row">
+                    <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                    <span class="chevron">&#9660;</span>
+                    <div class="tree-icon">&#x1F4C2;</div>
+                    <span class="tree-label c-gray">Persistence</span>
+                    <span class="tree-tag tag-infra">EF Core</span>
+                  </label>
+                  <div class="folder-children">
+                    <div style="display:flex;flex-direction:column">
+                      <input type="checkbox" id="f-dbctx" class="folder-toggle" checked>
+                      <label for="f-dbctx" class="folder-row">
+                        <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div>
+                        <span class="chevron">&#9660;</span>
+                        <div class="tree-icon">&#x1F4C2;</div>
+                        <span class="tree-label c-gray">DbContext</span>
+                      </label>
+                      <div class="folder-children">
+                        <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-blue">ReadDbContext.cs</span><span class="tree-tag tag-feature">queries</span></div>
+                        <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-coral">WriteDbContext.cs</span><span class="tree-tag tag-api">commands</span></div>
+                        <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-amber">BackgroundDbContext.cs</span><span class="tree-tag tag-entity">jobs</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GlobalUsings -->
+                <div class="file-row">
+                  <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div>
+                  <div class="tree-icon">&#x1F4C4;</div>
+                  <span class="tree-label c-gray">GlobalUsings.cs</span>
+                </div>
+
+              </div>
+            </div><!-- /DEMO.Core -->
+
+            <!-- DEMO.WebApi -->
+            <div style="display:flex;flex-direction:column">
+              <input type="checkbox" id="f-webapi" class="folder-toggle" checked>
+              <label for="f-webapi" class="folder-row">
+                <div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line last"></div></div>
+                <span class="chevron">&#9660;</span>
+                <div class="tree-icon">&#x1F534;</div>
+                <span class="tree-label c-coral" style="font-weight:600">DEMO.WebApi</span>
+                <span class="tree-tag tag-api">Web API</span>
+              </label>
+              <div class="folder-children">
+                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F4C2;</div><span class="tree-label c-coral">Properties</span></div>
+                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x2699;&#xFE0F;</div><span class="tree-label c-gray">appsettings.json</span></div>
+                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line branch"></div></div><div class="tree-icon">&#x1F310;</div><span class="tree-label c-gray">DEMO.WebApi.http</span></div>
+                <div class="file-row"><div class="tree-indent"><div class="tree-line empty"></div><div class="tree-line empty"></div><div class="tree-line last"></div></div><div class="tree-icon">&#x1F4C4;</div><span class="tree-label c-coral">Program.cs</span></div>
+              </div>
+            </div><!-- /DEMO.WebApi -->
+
+          </div>
+        </div><!-- /src -->
+
+      </div>
+    </div><!-- /tree-body -->
+  </div><!-- /tree-panel -->
+
+  <!-- DOCS PANEL -->
+  <div class="docs-panel">
+
+    <div class="legend">
+      <div class="section-label">Color Legend</div>
+      <div class="legend-items">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>DEMO.Core / Features</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Feature Slices</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Domain Entity</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Slice Files</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>DEMO.WebApi</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--gray)"></div>Infrastructure</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Architecture Overview</div>
+      <div class="doc-card">
+        <div class="doc-card-header"><div class="doc-card-icon icon-purple">&#x1F3D7;&#xFE0F;</div><div class="doc-card-title"><h3>Vertical Slice Architecture</h3><p>Each feature is a self-contained vertical slice through all layers</p></div></div>
+        <div class="doc-card-body">
+          <p style="color:var(--text2);font-size:13px;line-height:1.7">Instead of organizing code by technical layer (Controllers &#x2192; Services &#x2192; Repositories), this solution organizes by <strong style="color:var(--text);font-weight:500">feature</strong>. Each slice owns its command/query, handler, and validator &#x2014; nothing leaks across slice boundaries.</p>
+          <div class="flow-row">
+            <span class="flow-box fb-coral">HTTP Request</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-coral">Program.cs</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-teal">Feature Handler</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-amber">Supplier Entity</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-purple">WriteDbContext</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">DEMO.Core &#x2014; Business Logic</div>
+      <div class="doc-card">
+        <div class="doc-card-header"><div class="doc-card-icon icon-purple">&#x1F7E3;</div><div class="doc-card-title"><h3>Features / Supplier / v1</h3><p>Versioned feature folder &#x2014; all Supplier operations live here</p></div></div>
+        <div class="doc-card-body">
+          <div class="sub-items">
+            <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>CreateSupplier/</h4><p>Contains <code>CreateSupplierCommand.cs</code> (the input DTO / MediatR command), <code>CreateSupplierHandler.cs</code> (business logic, writes to DB), and <code>CreateSupplierValidator.cs</code> (FluentValidation rules).</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>GetAllSupplier/</h4><p>Contains <code>GetAllSupplierQuery.cs</code> (the MediatR query, often empty or with filter params) and <code>GetAllSupplierHandler.cs</code> (reads all suppliers from DB and returns a list).</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>UpdateSupplier/</h4><p>Contains <code>UpdateSupplierCommand.cs</code> (carries the updated fields + supplier ID), <code>UpdateSupplierHandler.cs</code> (fetches entity, applies changes, saves), and <code>UpdateSupplierValidator.cs</code>.</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x2B50;</div><div class="sub-item-text"><h4>Shared / Supplier.cs &#x2014; Domain Entity</h4><p>The <strong style="color:var(--amber);font-weight:500">core domain entity</strong> shared across all three slices. Defines the <code>Supplier</code> class with its properties (<code>Id</code>, <code>Name</code>, <code>Email</code>, <code>Phone</code>, <code>CreatedAt</code>). Versioned with <code>v1</code> so a future <code>v2</code> can introduce breaking changes without touching this.</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F4C4;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4 style="color:var(--gray)">Shared / SupplierConfiguration.cs &#x2014; EF Core Mapping</h4>
+                <p style="margin-bottom:10px">Implements <code>IEntityTypeConfiguration&lt;Supplier&gt;</code>. Tells EF Core how the <code>Supplier</code> entity maps to the database &#x2014; table name, column types, constraints, indexes. Lives next to <code>Supplier.cs</code> because it has no reason to exist without it. In pure VSA the slice owns its persistence mapping.</p>
+                <div style="background:var(--pre-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">public class</span> <span style="color:var(--text)">SupplierConfiguration</span>
+    : <span style="color:var(--teal)">IEntityTypeConfiguration</span>&lt;<span style="color:var(--teal)">Supplier</span>&gt;
+{
+    <span style="color:var(--purple)">public void</span> <span style="color:var(--blue)">Configure</span>(<span style="color:var(--teal)">EntityTypeBuilder</span>&lt;<span style="color:var(--teal)">Supplier</span>&gt; builder)
+    {
+        builder.<span style="color:var(--blue)">ToTable</span>(<span style="color:var(--amber)">"Suppliers"</span>);
+        builder.<span style="color:var(--blue)">HasKey</span>(x =&gt; x.Id);
+        builder.<span style="color:var(--blue)">Property</span>(x =&gt; x.Name).<span style="color:var(--blue)">IsRequired</span>().<span style="color:var(--blue)">HasMaxLength</span>(<span style="color:var(--green)">200</span>);
+        builder.<span style="color:var(--blue)">Property</span>(x =&gt; x.Email).<span style="color:var(--blue)">IsRequired</span>().<span style="color:var(--blue)">HasMaxLength</span>(<span style="color:var(--green)">320</span>);
+        builder.<span style="color:var(--blue)">Property</span>(x =&gt; x.Phone).<span style="color:var(--blue)">HasMaxLength</span>(<span style="color:var(--green)">20</span>);
+        builder.<span style="color:var(--blue)">Property</span>(x =&gt; x.CreatedAt).<span style="color:var(--blue)">IsRequired</span>();
+        builder.<span style="color:var(--blue)">HasIndex</span>(x =&gt; x.Email).<span style="color:var(--blue)">IsUnique</span>();
+    }
+}</pre>
+                </div>
+                <div style="margin-top:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px">
+                  <p style="font-size:12px;color:var(--text2);margin:0">&#x1F501; <strong style="color:var(--text);font-weight:500">Zero wiring needed.</strong> <code>WriteDbContext</code> calls <code>modelBuilder.ApplyConfigurationsFromAssembly(...)</code> &#x2014; it discovers <code>SupplierConfiguration</code> automatically.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">API Endpoint &#x2014; POST /v1/createsupplier</div>
+      <div class="doc-card">
+        <div class="doc-card-header"><div class="doc-card-icon icon-teal">&#x1F310;</div><div class="doc-card-title"><h3>CreateSupplierEndpoint.cs</h3><p>Minimal API endpoint &#x2014; maps HTTP POST to the MediatR command pipeline</p></div></div>
+        <div class="doc-card-body">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;padding:4px 12px;border-radius:6px;background:var(--teal-bg);border:1px solid color-mix(in srgb,var(--teal) 35%,transparent);color:var(--teal)">POST</span>
+            <code style="font-size:13px;color:var(--text);background:var(--bg3);padding:5px 14px;border-radius:6px;border:1px solid var(--border)">/v1/createsupplier</code>
+          </div>
+          <div class="flow-row" style="margin-bottom:20px">
+            <span class="flow-box fb-coral">HTTP POST</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-teal">Endpoint</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-purple">Validator</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-teal">Handler</span><span class="flow-arrow">&#x2192;</span>
+            <span class="flow-box fb-coral">WriteDbContext</span>
+          </div>
+          <div class="sub-items">
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F310;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4 style="color:var(--green)">CreateSupplierEndpoint.cs</h4>
+                <p style="margin-bottom:10px">Thin Minimal API registration. No business logic &#x2014; delegates immediately to MediatR.</p>
+                <div style="background:var(--pre-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">public static class</span> <span style="color:var(--text)">CreateSupplierEndpoint</span>
+{
+    <span style="color:var(--purple)">public static</span> <span style="color:var(--teal)">IEndpointRouteBuilder</span> <span style="color:var(--blue)">MapCreateSupplier</span>(
+        <span style="color:var(--purple)">this</span> <span style="color:var(--teal)">IEndpointRouteBuilder</span> app)
+    {
+        app.<span style="color:var(--blue)">MapPost</span>(<span style="color:var(--amber)">"v1/createsupplier"</span>,
+            <span style="color:var(--purple)">async</span> (<span style="color:var(--teal)">CreateSupplierCommand</span> command, <span style="color:var(--teal)">IMediator</span> mediator) =&gt;
+            {
+                <span style="color:var(--purple)">var</span> result = <span style="color:var(--purple)">await</span> mediator.<span style="color:var(--blue)">Send</span>(command);
+                <span style="color:var(--purple)">return</span> result.<span style="color:var(--blue)">IsSuccess</span>
+                    ? Results.<span style="color:var(--blue)">Created</span>(<span style="color:var(--amber)">$"v1/createsupplier/{result.Value}"</span>, result.Value)
+                    : Results.<span style="color:var(--blue)">BadRequest</span>(result.Error);
+            })
+           .<span style="color:var(--blue)">WithName</span>(<span style="color:var(--amber)">"CreateSupplier"</span>).<span style="color:var(--blue)">WithTags</span>(<span style="color:var(--amber)">"Supplier"</span>)
+           .<span style="color:var(--blue)">Produces</span>&lt;<span style="color:var(--teal)">int</span>&gt;(<span style="color:var(--green)">201</span>).<span style="color:var(--blue)">ProducesValidationProblem</span>();
+        <span style="color:var(--purple)">return</span> app;
+    }
+}</pre>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F4C4;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4 style="color:var(--blue)">CreateSupplierCommand.cs &#x2014; Request Body</h4>
+                <p style="margin-bottom:10px">MediatR command doubles as the request DTO. Bound automatically from the JSON body.</p>
+                <div style="background:var(--pre-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">public record</span> <span style="color:var(--text)">CreateSupplierCommand</span> : <span style="color:var(--teal)">IRequest</span>&lt;<span style="color:var(--teal)">Result</span>&lt;<span style="color:var(--teal)">int</span>&gt;&gt;
+{
+    <span style="color:var(--purple)">public string</span> <span style="color:var(--text)">Name</span>  { <span style="color:var(--purple)">get</span>; <span style="color:var(--purple)">init</span>; }
+    <span style="color:var(--purple)">public string</span> <span style="color:var(--text)">Email</span> { <span style="color:var(--purple)">get</span>; <span style="color:var(--purple)">init</span>; }
+    <span style="color:var(--purple)">public string</span> <span style="color:var(--text)">Phone</span> { <span style="color:var(--purple)">get</span>; <span style="color:var(--purple)">init</span>; }
+}</pre>
+                </div>
+                <div style="margin-top:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+                  <table class="pattern-table" style="margin-top:0">
+                    <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                    <tbody>
+                      <tr><td>name</td><td><code>string</code></td><td style="color:var(--coral)">&#x2705; Yes</td><td>Supplier display name</td></tr>
+                      <tr><td>email</td><td><code>string</code></td><td style="color:var(--coral)">&#x2705; Yes</td><td>Valid email address</td></tr>
+                      <tr><td>phone</td><td><code>string</code></td><td style="color:var(--text3)">&#x2B1C; Optional</td><td>Contact phone number</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="margin-top:12px;background:var(--teal-bg);border:1px solid color-mix(in srgb,var(--teal) 25%,transparent);border-radius:8px;padding:12px 14px">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-bottom:6px;letter-spacing:0.5px">EXAMPLE REQUEST BODY</div>
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6;color:var(--teal)">{
+  "name":  "Acme Supplies Ltd.",
+  "email": "contact@acme.com",
+  "phone": "+8801700000000"
+}</pre>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F4C4;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4 style="color:var(--blue)">CreateSupplierValidator.cs &#x2014; Validation Rules</h4>
+                <p style="margin-bottom:10px">FluentValidation runs via the MediatR pipeline behaviour before the handler is called. Returns <code>400 ValidationProblem</code> on failure.</p>
+                <div style="background:var(--pre-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">public class</span> <span style="color:var(--text)">CreateSupplierValidator</span>
+    : <span style="color:var(--teal)">AbstractValidator</span>&lt;<span style="color:var(--teal)">CreateSupplierCommand</span>&gt;
+{
+    <span style="color:var(--purple)">public</span> <span style="color:var(--text)">CreateSupplierValidator</span>()
+    {
+        <span style="color:var(--blue)">RuleFor</span>(x =&gt; x.Name).<span style="color:var(--blue)">NotEmpty</span>().<span style="color:var(--blue)">MaximumLength</span>(<span style="color:var(--green)">200</span>);
+        <span style="color:var(--blue)">RuleFor</span>(x =&gt; x.Email).<span style="color:var(--blue)">NotEmpty</span>().<span style="color:var(--blue)">EmailAddress</span>().<span style="color:var(--blue)">MaximumLength</span>(<span style="color:var(--green)">320</span>);
+        <span style="color:var(--blue)">RuleFor</span>(x =&gt; x.Phone).<span style="color:var(--blue)">MaximumLength</span>(<span style="color:var(--green)">20</span>).<span style="color:var(--blue)">When</span>(x =&gt; x.Phone <span style="color:var(--purple)">is not null</span>);
+    }
+}</pre>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F4C4;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4 style="color:var(--blue)">CreateSupplierHandler.cs &#x2014; Business Logic</h4>
+                <p style="margin-bottom:10px">Receives the validated command, maps it to a <code>Supplier</code> entity, persists via <code>WriteDbContext</code>, returns the new ID.</p>
+                <div style="background:var(--pre-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">public class</span> <span style="color:var(--text)">CreateSupplierHandler</span>
+    : <span style="color:var(--teal)">IRequestHandler</span>&lt;<span style="color:var(--teal)">CreateSupplierCommand</span>, <span style="color:var(--teal)">Result</span>&lt;<span style="color:var(--teal)">int</span>&gt;&gt;
+{
+    <span style="color:var(--purple)">private readonly</span> <span style="color:var(--teal)">WriteDbContext</span> _db;
+    <span style="color:var(--purple)">public</span> <span style="color:var(--text)">CreateSupplierHandler</span>(<span style="color:var(--teal)">WriteDbContext</span> db) =&gt; _db = db;
+    <span style="color:var(--purple)">public async</span> <span style="color:var(--teal)">Task</span>&lt;<span style="color:var(--teal)">Result</span>&lt;<span style="color:var(--teal)">int</span>&gt;&gt; <span style="color:var(--blue)">Handle</span>(<span style="color:var(--teal)">CreateSupplierCommand</span> cmd, <span style="color:var(--teal)">CancellationToken</span> ct)
+    {
+        <span style="color:var(--purple)">var</span> supplier = <span style="color:var(--purple)">new</span> <span style="color:var(--teal)">Supplier</span> { Name=cmd.Name, Email=cmd.Email, Phone=cmd.Phone, CreatedAt=<span style="color:var(--teal)">DateTime</span>.UtcNow };
+        _db.Suppliers.<span style="color:var(--blue)">Add</span>(supplier);
+        <span style="color:var(--purple)">await</span> _db.<span style="color:var(--blue)">SaveChangesAsync</span>(ct);
+        <span style="color:var(--purple)">return</span> <span style="color:var(--teal)">Result</span>.<span style="color:var(--blue)">Success</span>(supplier.Id);
+    }
+}</pre>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x1F4CB;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4>Response Codes</h4>
+                <div style="margin-top:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+                  <table class="pattern-table" style="margin-top:0">
+                    <thead><tr><th>Status</th><th>When</th><th>Body</th></tr></thead>
+                    <tbody>
+                      <tr><td style="color:var(--teal)">201 Created</td><td>Supplier saved successfully</td><td><code>int</code> &#x2014; new supplier ID</td></tr>
+                      <tr><td style="color:var(--amber)">400 Bad Request</td><td>Validation failure</td><td><code>ValidationProblemDetails</code></td></tr>
+                      <tr><td style="color:var(--coral)">500 Internal Server Error</td><td>Unhandled exception / DB error</td><td><code>ProblemDetails</code></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+                  <div style="background:var(--teal-bg);border:1px solid color-mix(in srgb,var(--teal) 25%,transparent);border-radius:8px;padding:12px 14px">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-bottom:6px;letter-spacing:0.5px">201 CREATED</div>
+                    <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text2)">42</pre>
+                  </div>
+                  <div style="background:var(--amber-bg);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:8px;padding:12px 14px">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber);margin-bottom:6px;letter-spacing:0.5px">400 VALIDATION ERROR</div>
+                    <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:var(--text2)">{
+  "errors": {
+    "Email": ["Not a valid email."]
+  }
+}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="sub-item">
+              <div class="sub-item-icon">&#x2699;&#xFE0F;</div>
+              <div class="sub-item-text" style="width:100%">
+                <h4>Program.cs &#x2014; Endpoint Registration</h4>
+                <p style="margin-bottom:10px">Wire the endpoint using the extension method pattern:</p>
+                <div style="background:var(--coral-bg);border:1px solid color-mix(in srgb,var(--coral) 25%,transparent);border-radius:8px;padding:12px 14px;overflow-x:auto">
+                  <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:var(--text2)"><span style="color:var(--purple)">var</span> app = builder.<span style="color:var(--blue)">Build</span>();
+app.<span style="color:var(--blue)">MapCreateSupplier</span>();   <span style="color:var(--text3)">// POST /v1/createsupplier</span>
+app.<span style="color:var(--blue)">MapGetAllSupplier</span>();    <span style="color:var(--text3)">// GET  /v1/getallsupplier</span>
+app.<span style="color:var(--blue)">MapUpdateSupplier</span>();    <span style="color:var(--text3)">// PUT  /v1/updatesupplier</span>
+app.<span style="color:var(--blue)">Run</span>();</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">DEMO.Core &#x2014; Infrastructure</div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div class="doc-card">
+          <div class="doc-card-header"><div class="doc-card-icon icon-gray">&#x1F517;</div><div class="doc-card-title"><h3>Shared / Common &amp; Constants</h3><p>Solution-wide reusables &#x2014; not feature-specific</p></div></div>
+          <div class="doc-card-body">
+            <div class="sub-items">
+              <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>Common/</h4><p>Base classes, extension methods, generic result wrappers (e.g. <code>Result&lt;T&gt;</code>), and interfaces used across multiple features.</p></div></div>
+              <div class="divider"></div>
+              <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>Constants/</h4><p>Static string/int constants used across the solution &#x2014; route prefixes, error codes, pagination defaults, policy names.</p></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-card-header"><div class="doc-card-icon icon-gray">&#x1F5C4;&#xFE0F;</div><div class="doc-card-title"><h3>Persistence / DbContext</h3><p>3 purpose-separated EF Core database contexts</p></div></div>
+          <div class="doc-card-body">
+            <div class="sub-items">
+              <div class="sub-item"><div class="sub-item-icon">&#x1F4C4;</div><div class="sub-item-text"><h4 style="color:var(--blue)">ReadDbContext.cs</h4><p>Used exclusively by <strong style="color:var(--text);font-weight:500">query handlers</strong>. Change tracking disabled (<code>AsNoTracking()</code>) for maximum read performance. Never used to save changes.</p><div style="margin-top:8px;background:var(--blue-bg);border:1px solid color-mix(in srgb,var(--blue) 25%,transparent);border-radius:6px;padding:10px 12px"><code style="font-size:11px;color:var(--blue)">opts.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);</code></div></div></div>
+              <div class="divider"></div>
+              <div class="sub-item"><div class="sub-item-icon">&#x1F4C4;</div><div class="sub-item-text"><h4 style="color:var(--coral)">WriteDbContext.cs</h4><p>Used exclusively by <strong style="color:var(--text);font-weight:500">command handlers</strong>. Full change tracking enabled so EF Core can detect mutations and generate correct SQL on <code>SaveChangesAsync()</code>.</p><div style="margin-top:8px;background:var(--coral-bg);border:1px solid color-mix(in srgb,var(--coral) 25%,transparent);border-radius:6px;padding:10px 12px"><code style="font-size:11px;color:var(--coral)">opts.UseSqlServer(connectionString);</code></div></div></div>
+              <div class="divider"></div>
+              <div class="sub-item"><div class="sub-item-icon">&#x1F4C4;</div><div class="sub-item-text"><h4 style="color:var(--amber)">BackgroundDbContext.cs</h4><p>Used by <strong style="color:var(--text);font-weight:500">hosted services and background jobs</strong>. Registered with a separate lifetime scope. Injected via <code>IServiceScopeFactory</code> inside a <code>BackgroundService</code>.</p><div style="margin-top:8px;background:var(--amber-bg);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:6px;padding:10px 12px"><code style="font-size:11px;color:var(--amber)">var db = scope.ServiceProvider.GetRequiredService&lt;BackgroundDbContext&gt;();</code></div></div></div>
+            </div>
+            <div style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <table class="pattern-table" style="margin-top:0">
+                <thead><tr><th>Context</th><th>Tracking</th><th>Used by</th><th>SaveChanges</th></tr></thead>
+                <tbody>
+                  <tr><td style="color:var(--blue)">ReadDbContext</td><td>&#x274C; Disabled</td><td>Query handlers</td><td>Never</td></tr>
+                  <tr><td style="color:var(--coral)">WriteDbContext</td><td>&#x2705; Enabled</td><td>Command handlers</td><td>Always</td></tr>
+                  <tr><td style="color:var(--amber)">BackgroundDbContext</td><td>&#x2705; Enabled</td><td>Background services</td><td>As needed</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-card-header"><div class="doc-card-icon icon-gray">&#x1F4C4;</div><div class="doc-card-title"><h3>GlobalUsings.cs</h3><p>.NET 6+ global using directives</p></div></div>
+          <div class="doc-card-body"><p style="color:var(--text2);font-size:13px;line-height:1.7">Centralizes <code>global using</code> statements so commonly used namespaces (<code>MediatR</code>, <code>FluentValidation</code>, <code>Microsoft.EntityFrameworkCore</code>) don&#x27;t need to be repeated in every file.</p></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">DEMO.WebApi &#x2014; Entry Point</div>
+      <div class="doc-card">
+        <div class="doc-card-header"><div class="doc-card-icon icon-coral">&#x1F534;</div><div class="doc-card-title"><h3>DEMO.WebApi</h3><p>Thin host &#x2014; no business logic lives here</p></div></div>
+        <div class="doc-card-body">
+          <div class="sub-items">
+            <div class="sub-item"><div class="sub-item-icon">&#x1F4C4;</div><div class="sub-item-text"><h4>Program.cs</h4><p>Registers services (MediatR, FluentValidation, EF Core, Swagger), configures middleware pipeline, and maps minimal API endpoints. The only place DI wiring happens.</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x2699;&#xFE0F;</div><div class="sub-item-text"><h4>appsettings.json</h4><p>Holds configuration values &#x2014; connection strings, JWT settings, logging levels, environment-specific overrides (<code>appsettings.Development.json</code>).</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x1F310;</div><div class="sub-item-text"><h4>DEMO.WebApi.http</h4><p>Visual Studio&#x27;s built-in HTTP client file &#x2014; test endpoints directly from the IDE without Postman. Contains sample requests for each supplier endpoint.</p></div></div>
+            <div class="divider"></div>
+            <div class="sub-item"><div class="sub-item-icon">&#x1F4C2;</div><div class="sub-item-text"><h4>Properties/</h4><p>Contains <code>launchSettings.json</code> &#x2014; defines how the app launches locally (port, environment variables, IIS Express / Kestrel profiles).</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">File Naming Conventions</div>
+      <div class="doc-card">
+        <div class="doc-card-body" style="padding:0">
+          <table class="pattern-table">
+            <thead><tr><th>File</th><th>Pattern</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>Supplier.cs</td><td><code>Entity.cs</code></td><td>Domain entity / data model</td></tr>
+              <tr><td>SupplierConfiguration.cs</td><td><code>EntityConfiguration.cs</code></td><td>EF Core entity type configuration</td></tr>
+              <tr><td>CreateSupplierCommand.cs</td><td><code>{Action}{Feature}Command.cs</code></td><td>MediatR write command (CQRS)</td></tr>
+              <tr><td>GetAllSupplierQuery.cs</td><td><code>{Action}{Feature}Query.cs</code></td><td>MediatR read query (CQRS)</td></tr>
+              <tr><td>CreateSupplierHandler.cs</td><td><code>{Action}{Feature}Handler.cs</code></td><td>Handles command or query logic</td></tr>
+              <tr><td>CreateSupplierValidator.cs</td><td><code>{Action}{Feature}Validator.cs</code></td><td>FluentValidation rules</td></tr>
+              <tr><td>GlobalUsings.cs</td><td><code>GlobalUsings.cs</code></td><td>Project-wide global usings</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /docs-panel -->
+</div><!-- /layout -->
+
+<div style="width:100%;padding:0 4vw">
+  <footer>
+    <span>DEMO Solution &middot; Vertical Slice Architecture</span>
+    <span>.NET 10 &middot; MediatR &middot; FluentValidation &middot; EF Core</span>
+    <span>&copy; 2025 Hasibul Hasan &middot; All Rights Reserved</span>
+  </footer>
+</div>
+
+<script>
+  const btn = document.getElementById('themeBtn');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('cms-theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('cms-theme', next);
+  });
+  function setAllFolders(open) {
+    document.querySelectorAll('.folder-toggle').forEach(cb => cb.checked = open);
+  }
+</script>
+</body>
+</html>
