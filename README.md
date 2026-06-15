@@ -1,11 +1,11 @@
-﻿# DotRidu - Clean Architecture Template
+﻿# DotRidu - Vertical Slice Architecture Template
 
 [![NuGet](https://img.shields.io/nuget/v/dotridu)](https://www.nuget.org/packages/dotridu)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/dotridu)](https://www.nuget.org/packages/dotridu)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 
-A production-ready ASP.NET Core Clean Architecture template with JWT authentication, Repository Pattern, and Entity Framework Core.
+A production-ready ASP.NET Core Vertical Slice Architecture template with JWT authentication, MediatR, FluentValidation, and Entity Framework Core.
 
 ## 🚀 Quick Start
 
@@ -38,21 +38,45 @@ dotnet new uninstall dotridu
 ```
 YourProjectName/
 ├── src/
-│   ├── Core/
-│   │   ├── YourProjectName.Application/     # Business Logic Layer
-│   │   ├── YourProjectName.Domain/          # Domain Layer (Entities, Interfaces)
-│   │   └── YourProjectName.Infrastructure/  # Infrastructure Layer (Data Access)
-│   └── Web.Api/
-│       └── YourProjectName.WebApi/          # Presentation Layer
+│   ├── YourProjectName.Core/                # Business Logic
+│   │   ├── Features/
+│   │   │   └── {Feature}/
+│   │   │       └── v1/
+│   │   │           ├── Create{Feature}/
+│   │   │           │   ├── Create{Feature}Endpoint.cs
+│   │   │           │   ├── Create{Feature}Command.cs
+│   │   │           │   ├── Create{Feature}Handler.cs
+│   │   │           │   └── Create{Feature}Validator.cs
+│   │   │           ├── GetAll{Feature}/
+│   │   │           │   ├── GetAll{Feature}Endpoint.cs
+│   │   │           │   ├── GetAll{Feature}Query.cs
+│   │   │           │   └── GetAll{Feature}Handler.cs
+│   │   │           └── Shared/
+│   │   │               ├── {Feature}.cs                  # Domain Entity
+│   │   │               └── {Feature}Configuration.cs     # EF Core Mapping
+│   │   ├── Shared/
+│   │   │   ├── Common/
+│   │   │   └── Constants/
+│   │   ├── Persistence/
+│   │   │   └── DbContext/
+│   │   │       ├── ReadDbContext.cs
+│   │   │       ├── WriteDbContext.cs
+│   │   │       └── BackgroundDbContext.cs
+│   │   └── GlobalUsings.cs
+│   └── YourProjectName.WebApi/              # Entry Point
+│       ├── Program.cs
+│       └── appsettings.json
 └── YourProjectName.slnx
 ```
 
 ## ✨ Features
-- ✅ Clean Architecture
+- ✅ Vertical Slice Architecture
+- ✅ CQRS with MediatR
+- ✅ FluentValidation (pipeline behaviour)
+- ✅ Entity Framework Core (Read / Write / Background DbContexts)
 - ✅ JWT Authentication
-- ✅ Repository Pattern
-- ✅ Entity Framework Core
-- ✅ Swagger/OpenAPI
+- ✅ Minimal API Endpoints
+- ✅ Swagger / OpenAPI
 - ✅ Global Exception Handling
 - ✅ Serilog Logging
 - ✅ Health Checks

@@ -1,11 +1,6 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Core/">
-    <Project Path="src/Core/DotRidu.Application/DotRidu.Application.csproj" />
-    <Project Path="src/Core/DotRidu.Domain/DotRidu.Domain.csproj" />
-    <Project Path="src/Core/DotRidu.Infrastructure/DotRidu.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/src/Web.Api/">
-    <Project Path="src/Web.Api/DotRidu.WebApi/DotRidu.WebApi.csproj" Id="06a1108d-da71-4b74-b9c5-766ab8840e44" />
+  <Folder Name="/src/">
+    <Project Path="src/DotRidu.Core/DotRidu.Core.csproj" Id="5dda19aa-8244-4642-8d75-76a28774ee48" />
+    <Project Path="src/DotRidu.WebApi/DotRidu.WebApi.csproj" Id="c3b0a749-54d7-4845-bbad-d12b890ecdb3" />
   </Folder>
 </Solution>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Users\v1\CreateUser\" />
+    <Folder Include="Features\Users\v1\UpdateUser\" />
+    <Folder Include="Features\Users\v1\Shared\" />
+    <Folder Include="Shared\Common\" />
+    <Folder Include="Shared\Constants\" />
+  </ItemGroup>
+
+</Project>
